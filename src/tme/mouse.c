@@ -8,50 +8,32 @@
  */
 #include "mouse.h"
 
-typedef struct {
-	int dx, dy;
-	int btn;
-	int rpx, rpy;
-} Mouse;
-
-static const int quad[4]={0x0, 0x1, 0x3, 0x2};
-
-Mouse mouse;
-
-#define MAXCDX 640
+static volatile int posX = 320;
+static volatile int posY = 240;
+static volatile int posDirty = 0;
+static volatile int posBtn = 0;
 
 void mouseMove(int dx, int dy, int btn) {
-	// Scale by 2: quadrature encoding needs 2 ticks per pixel
-	// (SCC DCD interrupt fires every 2 quad steps)
-	mouse.dx+=dx*2;
-	mouse.dy+=dy*2;
-	if (mouse.dx>MAXCDX) mouse.dx=MAXCDX;
-	if (mouse.dy>MAXCDX) mouse.dy=MAXCDX;
-	if (mouse.dx<-MAXCDX) mouse.dx=-MAXCDX;
-	if (mouse.dy<-MAXCDX) mouse.dy=-MAXCDX;
-	if (btn) mouse.btn=1; else mouse.btn=0;
+	int x = posX + dx;
+	int y = posY + dy;
+	if (x < 0) x = 0;
+	if (y < 0) y = 0;
+	if (x > 639) x = 639;
+	if (y > 479) y = 479;
+	posX = x;
+	posY = y;
+	posBtn = btn ? 1 : 0;
+	if (dx || dy) posDirty = 1;
 }
 
-int mouseTick() {
-	int ret=0;
-	if (mouse.dx>0) {
-		mouse.dx--;
-		mouse.rpx--;
-	}
-	if (mouse.dx<0) {
-		mouse.dx++;
-		mouse.rpx++;
-	}
-	if (mouse.dy>0) {
-		mouse.dy--;
-		mouse.rpy++;
-	}
-	if (mouse.dy<0) {
-		mouse.dy++;
-		mouse.rpy--;
-	}
-	ret=quad[mouse.rpx&3];
-	ret|=quad[mouse.rpy&3]<<2;
-	ret|=mouse.btn<<4;
-	return ret;
+int mouseButton(void) {
+	return posBtn;
+}
+
+int mouseTakePos(int *x, int *y) {
+	*x = posX;
+	*y = posY;
+	if (!posDirty) return 0;
+	posDirty = 0;
+	return 1;
 }
