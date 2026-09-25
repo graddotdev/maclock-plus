@@ -1,5 +1,3 @@
-<a href="https://claude.ai"><img src="images/made-with-claude.png" height="32" alt="Made with Claude"></a>
-
 # Mac Plus Emulator on ESP32-S3
 
 <img src="images/esp32_mac.jpeg" height="200" alt="Mac Plus emulator running on ESP32-S3"><img src="images/build.jpg" height="200" alt="Build"><img src="images/maclock.jpg" height="200" alt="Final">
