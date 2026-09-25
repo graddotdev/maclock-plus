@@ -60,7 +60,7 @@ class InputCallbacks : public BLECharacteristicCallbacks {
 };
 
 void bleInputInit() {
-    BLEDevice::init("MacPlus");
+    BLEDevice::init("Maclock Plus");
     BLEServer *server = BLEDevice::createServer();
     server->setCallbacks(new ServerCallbacks());
 
@@ -80,5 +80,5 @@ void bleInputInit() {
     adv->setMinPreferred(0x06);
     adv->start();
 
-    printf("BLE: advertising as 'MacPlus'\n");
+    printf("BLE: advertising as 'Maclock Plus'\n");
 }
