@@ -352,16 +352,29 @@ void tmeStartEmu(void *rom) {
 			viaStep(100);
 			sccTick(100);
 
-			int r=mouseTick();
-			if (r&MOUSE_BTN) viaClear(VIA_PORTB, (1<<3)); else viaSet(VIA_PORTB, (1<<3));
-			if (r&MOUSE_QXB) viaClear(VIA_PORTB, (1<<4)); else viaSet(VIA_PORTB, (1<<4));
-			if (r&MOUSE_QYB) viaClear(VIA_PORTB, (1<<5)); else viaSet(VIA_PORTB, (1<<5));
-			sccSetDcd(SCC_CHANA, r&MOUSE_QXA);
-			sccSetDcd(SCC_CHANB, r&MOUSE_QYA);
+			if (mouseButton()) viaClear(VIA_PORTB, (1<<3)); else viaSet(VIA_PORTB, (1<<3));
 
 			if (x>(8000000/120) && sndDone()) break;
 		}
 		cyclesPerSec+=x;
+		{
+			int mx, my;
+			if (mouseTakePos(&mx, &my)) {
+				macRam[0x828] = (my >> 8) & 0xFF;
+				macRam[0x829] = my & 0xFF;
+				macRam[0x82A] = (mx >> 8) & 0xFF;
+				macRam[0x82B] = mx & 0xFF;
+				macRam[0x82C] = (my >> 8) & 0xFF;
+				macRam[0x82D] = my & 0xFF;
+				macRam[0x82E] = (mx >> 8) & 0xFF;
+				macRam[0x82F] = mx & 0xFF;
+				macRam[0x830] = (my >> 8) & 0xFF;
+				macRam[0x831] = my & 0xFF;
+				macRam[0x832] = (mx >> 8) & 0xFF;
+				macRam[0x833] = mx & 0xFF;
+				macRam[0x8CE] = 0xFF;
+			}
+		}
 		dispDraw(macFb[video_remap?1:0]);
 		sndPush(macSnd[audio_remap?1:0], audio_en?audio_volume:0);
 		vTaskDelay(1); // yield to prevent watchdog timeout
