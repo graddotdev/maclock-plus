@@ -104,7 +104,7 @@ A hosted version is available at **https://memention.com/esp32_mac/**
 1. Open the hosted version above, or serve `web/index.html` yourself
 2. Open the page in Chrome on your phone/computer
 3. Tap the gear icon and select **Reconnect BLE**
-4. Select **MacPlus** from the browser's Bluetooth pairing dialog
+4. Select **Maclock Plus** from the browser's Bluetooth pairing dialog
 
 The web UI provides:
 
