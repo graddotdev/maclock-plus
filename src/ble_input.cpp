@@ -11,6 +11,9 @@
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
+#include <BLEAdvertising.h>
+#include "esp_mac.h"
+#include "esp_gap_ble_api.h"
 #include "ble_input.h"
 
 extern "C" {
@@ -61,6 +64,18 @@ class InputCallbacks : public BLECharacteristicCallbacks {
 
 void bleInputInit() {
     BLEDevice::init("Maclock Plus");
+
+    uint8_t mac[6];
+    esp_read_mac(mac, ESP_MAC_BT);
+    esp_bd_addr_t addr;
+    addr[0] = (mac[0] & 0x3F) | 0xC0;
+    addr[1] = mac[1];
+    addr[2] = mac[2];
+    addr[3] = mac[3];
+    addr[4] = mac[4];
+    addr[5] = mac[5] ^ 0x5A;
+    esp_ble_gap_set_rand_addr(addr);
+
     BLEServer *server = BLEDevice::createServer();
     server->setCallbacks(new ServerCallbacks());
 
@@ -75,10 +90,14 @@ void bleInputInit() {
     service->start();
 
     BLEAdvertising *adv = BLEDevice::getAdvertising();
+    BLEAdvertisementData scanData;
+    scanData.setName("Maclock Plus");
+    adv->setScanResponseData(scanData);
     adv->addServiceUUID(SERVICE_UUID);
     adv->setScanResponse(true);
     adv->setMinPreferred(0x06);
     adv->start();
 
-    printf("BLE: advertising as 'Maclock Plus'\n");
+    printf("BLE: advertising as 'Maclock Plus' %02x:%02x:%02x:%02x:%02x:%02x\n",
+           addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);
 }
