@@ -74,10 +74,10 @@ static void patchRomForLargeScreen(uint8_t *rom) {
     // 5. Screen clear: size in longwords
     rom_put_word(rom, 494, (H * W / 32) - 1);
 
-    // 6. Screen setup: JSR to patch that sets ScrnBase
-    //    We write a small patch routine at the end of the Sony driver area.
-    //    Find free space after offset 0x1A000 (well within 128KB ROM).
-    int patchAddr = 0x1E000;  // Free area near end of ROM
+    // 6. Screen setup: JSR to a stub that writes ScrnBase.
+    //    0xD7C is the ROM checksum loop skipped by the BRA at 0xD7A.
+    //    0x1E000 is SANE PACK 4. A stub there RTS's out of FP68K.
+    int patchAddr = 0xD7C;
     // At ROM offset 1132: JSR to our patch
     rom_put_word(rom, 1132, 0x4EB9);                   // JSR abs.L
     rom_put_long(rom, 1134, 0x00400000 + patchAddr);    // ROM base + patch offset
